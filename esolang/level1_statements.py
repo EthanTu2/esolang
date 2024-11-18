@@ -6,8 +6,8 @@ grammar = esolang.level0_arithmetic.grammar + r"""
     %extend start: start (";" start)*
         | assign_var
         | block
-        | /#.*/                -> comment
         | if_statement
+        | /#.*/                -> comment
 
     if_statement: "if" condition ":" block "else" start
 

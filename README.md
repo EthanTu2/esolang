@@ -2,24 +2,26 @@
 
 A simple esolang for experimenting with different syntax and semantics of programming languages.
 
-## Level 0 Arithmetic Interpreter Doctests
+## Added Level 1 Statements Interpreter Doctests
 
 ```python
 >>> interpreter = Interpreter()
->>> interpreter.visit(parser.parse("if (0): { 10 } else 5"))  
-5
->>> interpreter.visit(parser.parse("if (1): { 10 } else 5"))  
-5
+>>> interpreter.visit(parser.parse("if (0): { 10 } else 5"))
+    5
+>>> interpreter.visit(parser.parse("if (1): { 10 } else 5"))
+    10
 >>> interpreter.visit(parser.parse("a = 10; if (a): { 10 } else 0"))
-0
+    10
 >>> interpreter.visit(parser.parse("a = 1; if (a): { 10 } else 100"))
-100
+    10
+>>> interpreter.visit(parser.parse("a = 2; b = 1; if (a-b): { 5 } else 1"))
+    5
+>>> interpreter.visit(parser.parse("a = 2; b = 2; if (a-b): { 5 } else 1"))
+    1
 >>> interpreter.visit(parser.parse("x = 2; { x = x + 3; x + 5 }"))
-10
->>> interpreter.visit(parser.parse("a=2; b=1; if (a-b): { 5 } else 1"))
-1
+    10
 ```
-## Level 1 Interpreter Doctests
+## Added Level 2 Loops Interpreter Doctests
 
 ```python
 >>> interpreter = Interpreter()
@@ -53,3 +55,16 @@ A simple esolang for experimenting with different syntax and semantics of progra
 2
 ```
 
+## Added Level 3 Interpreter Doctests
+
+```
+>>> interpreter = Interpreter()
+        >>> interpreter.visit(parser.parse("is_prime(1)"))
+        False
+        >>> interpreter.visit(parser.parse("is_prime(2)"))
+        True
+        >>> interpreter.visit(parser.parse("is_prime(5)"))
+        True
+        >>> interpreter.visit(parser.parse("is_prime(8)"))
+        False
+```
