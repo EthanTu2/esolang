@@ -9,11 +9,11 @@ grammar = esolang.level0_arithmetic.grammar + r"""
         | if_statement
         | /#.*/                -> comment
 
-    if_statement: "if" condition ":" block "else" start
+    if_statement: "if" condition ":" start "else" start
 
-    condition: "(" start ")"
+    ?condition: start
 
-    block: "{" (start ";")* start "}"
+    block: "{" start* "}"
 
     assign_var: NAME "=" start
 
@@ -82,11 +82,14 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
         return value
     
     def if_statement(self, tree):
-        condition = self.visit(tree.children[0]) 
-        if condition != 0:  
-            return self.visit(tree.children[1])  
-        else: 
-            return self.visit(tree.children[2]) 
+        condition = self.visit(tree.children[0])  
+        block = self.visit(tree.children[1])     
+        start = self.visit(tree.children[2])      
+        if condition == 0:  
+            return start
+        else:  
+            return block  
+            
 
     def assign_var(self, tree):
         name = tree.children[0].value

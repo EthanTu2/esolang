@@ -2,7 +2,7 @@
 
 A simple esolang for experimenting with different syntax and semantics of programming languages.
 
-## Added Level 1 Statements Interpreter Doctests
+## New Level 1 Statements Interpreter Doctests
 
 ```python
 >>> interpreter = Interpreter()
@@ -21,7 +21,7 @@ A simple esolang for experimenting with different syntax and semantics of progra
 >>> interpreter.visit(parser.parse("x = 2; { x = x + 3; x + 5 }"))
     10
 ```
-## Added Level 2 Loops Interpreter Doctests
+## New Level 2 Loops Interpreter Doctests
 
 ```python
 >>> interpreter = Interpreter()
@@ -55,7 +55,7 @@ A simple esolang for experimenting with different syntax and semantics of progra
 2
 ```
 
-## Added Level 3 Interpreter Doctests
+## New Level 3 Interpreter Doctests
 
 ```
 >>> interpreter = Interpreter()
