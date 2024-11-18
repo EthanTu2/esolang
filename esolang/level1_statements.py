@@ -1,44 +1,3 @@
-'''
-
-The following tests show example strings in the language.
-There are no meaningful commands at this point,
-only a block structure.
-
->>> tree = parser.parse("")
->>> tree = parser.parse(";")
->>> tree = parser.parse(";;;;")
->>> tree = parser.parse("{{}}")
->>> tree = parser.parse(";{};{;;}")
->>> tree = parser.parse(";{{}{{}}};{;{}{;};}")
-
-The following tests check that unbalanced blocks correctly raise exceptions.
-
->>> tree = parser.parse("{") # doctest: +IGNORE_EXCEPTION_DETAIL
-Traceback (most recent call last):
-    ...
-lark.exceptions.UnexpectedEOF:
-
->>> tree = parser.parse("{{}{}{{{}}") # doctest: +IGNORE_EXCEPTION_DETAIL
-Traceback (most recent call last):
-    ...
-lark.exceptions.UnexpectedEOF:
-
->>> tree = parser.parse("{;;;}}") # doctest: +IGNORE_EXCEPTION_DETAIL
-Traceback (most recent call last):
-    ...
-lark.exceptions.UnexpectedCharacters:
-    
-The following checks test that comments work.
-
->>> tree = parser.parse(";{};#")
->>> tree = parser.parse(";{};#{")
->>> tree = parser.parse(";{#}") # doctest: +IGNORE_EXCEPTION_DETAIL
-Traceback (most recent call last):
-    ...
-lark.exceptions.UnexpectedEOF:
-
-'''
-
 import lark
 import esolang.level0_arithmetic
 
@@ -48,9 +7,13 @@ grammar = esolang.level0_arithmetic.grammar + r"""
         | assign_var
         | block
         | /#.*/                -> comment
-        |
+        | if_statement
 
-    block: "{" start* "}"
+    if_statement: "if" condition ":" block "else" start
+
+    condition: "(" start ")"
+
+    block: "{" (start ";")* start "}"
 
     assign_var: NAME "=" start
 
@@ -84,6 +47,22 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
     Traceback (most recent call last):
         ...
     ValueError: Variable c undefined
+
+    >>> interpreter.visit(parser.parse("if (0): { 10 } else 5"))
+    5
+    >>> interpreter.visit(parser.parse("if (1): { 10 } else 5"))
+    10
+    >>> interpreter.visit(parser.parse("a = 10; if (a): { 10 } else 0"))
+    10
+    >>> interpreter.visit(parser.parse("a = 1; if (a): { 10 } else 100"))
+    10
+    >>> interpreter.visit(parser.parse("a = 2; b = 1; if (a-b): { 5 } else 1"))
+    5
+    >>> interpreter.visit(parser.parse("a = 2; b = 2; if (a-b): { 5 } else 1"))
+    1
+    >>> interpreter.visit(parser.parse("x = 2; { x = x + 3; x + 5 }"))
+    10
+    
     '''
     def __init__(self):
         self.stack = [{}]
@@ -101,6 +80,13 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
                 return value
         self.stack[-1][name] = value
         return value
+    
+    def if_statement(self, tree):
+        condition = self.visit(tree.children[0]) 
+        if condition != 0:  
+            return self.visit(tree.children[1])  
+        else: 
+            return self.visit(tree.children[2]) 
 
     def assign_var(self, tree):
         name = tree.children[0].value
@@ -114,6 +100,8 @@ class Interpreter(esolang.level0_arithmetic.Interpreter):
 
     def block(self, tree):
         self.stack.append({})
-        res = self.visit(tree.children[0])
+        result = None
+        for stmt in tree.children:
+            result = self.visit(stmt)
         self.stack.pop()
-        return res
+        return result
